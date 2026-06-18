@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LogiCash - Protótipo Mobile</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1f3a'/%3E%3Cpath d='M18 16h10v24h18v8H18z' fill='%2327b47e'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --navy: #0b1f3a;
+      --navy-2: #12365f;
+      --blue: #1d5d9f;
+      --blue-soft: #eaf3ff;
+      --green: #16855f;
+      --green-soft: #e7f6ef;
+      --orange: #b96b10;
+      --orange-soft: #fff2de;
+      --red: #ba2d2d;
+      --red-soft: #ffe9e8;
+      --gray-900: #1e293b;
+      --gray-700: #475569;
+      --gray-500: #64748b;
+      --gray-300: #d8e0ea;
+      --gray-200: #edf1f6;
+      --gray-100: #f6f8fb;
+      --white: #ffffff;
+      --shadow: 0 10px 25px rgba(15, 31, 58, 0.08);
+      --shadow-soft: 0 6px 16px rgba(15, 31, 58, 0.07);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --nav-height: 74px;
+      --top-height: 86px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 24px;
+      background: #dfe5ed;
+      color: var(--gray-900);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .phone {
+      position: relative;
+      width: 414px;
+      height: 868px;
+      overflow: hidden;
+      border: 12px solid #111827;
+      border-radius: 46px;
+      background: var(--gray-100);
+      box-shadow: 0 28px 70px rgba(15, 23, 42, 0.32), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 9px;
+      left: 50%;
+      z-index: 10;
+      width: 116px;
+      height: 28px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #111827;
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--gray-100);
+    }
+
+    .screen {
+      display: none;
+      height: 100%;
+      background: var(--gray-100);
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .screen.login-screen {
+      background:
+        radial-gradient(circle at 80% 10%, rgba(29, 93, 159, 0.25), transparent 26%),
+        linear-gradient(160deg, #0b1f3a 0%, #12365f 55%, #f6f8fb 55%);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: var(--top-height);
+      padding: 42px 18px 10px;
+      background: rgba(246, 248, 251, 0.94);
+      border-bottom: 1px solid rgba(216, 224, 234, 0.78);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar h1 {
+      max-width: 232px;
+      margin: 0;
+      color: var(--navy);
+      font-size: 20px;
+      line-height: 1.05;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .topbar p {
+      max-width: 232px;
+      margin: 3px 0 0;
+      color: var(--gray-500);
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 700;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #detalhes .topbar h1 {
+      font-size: 18px;
+      max-width: 232px;
+    }
+
+    .company-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      max-width: 120px;
+      padding: 7px 8px;
+      border: 1px solid var(--gray-300);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--navy-2);
+      font-size: 10.5px;
+      font-weight: 800;
+      line-height: 1.1;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .company-dot {
+      width: 8px;
+      min-width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+    }
+
+    .content {
+      height: calc(100% - var(--top-height));
+      overflow-y: auto;
+      padding: 14px 16px calc(var(--nav-height) + 22px);
+      scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-nav .content {
+      height: 100%;
+      padding: 0;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 8;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      height: var(--nav-height);
+      padding: 8px 10px 10px;
+      border-top: 1px solid var(--gray-300);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 -10px 22px rgba(15, 31, 58, 0.08);
+      backdrop-filter: blur(18px);
+    }
+
+    .bottom-nav.hidden {
+      display: none;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: var(--gray-500);
+      font-size: 10.5px;
+      font-weight: 800;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
+    }
+
+    .nav-item.active {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .nav-item:active,
+    .action-btn:active,
+    .ghost-btn:active,
+    .card-button:active {
+      transform: scale(0.97);
+    }
+
+    .login-wrap {
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 48px 20px 28px;
+    }
+
+    .brand-panel {
+      margin-bottom: 42px;
+      color: var(--white);
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .logo-symbol {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #27b47e, #1d5d9f);
+      box-shadow: 0 14px 25px rgba(0, 0, 0, 0.24);
+      color: white;
+      font-weight: 900;
+      font-size: 23px;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .brand-subtitle {
+      max-width: 280px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 15px;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .login-card {
+      padding: 22px;
+      border: 1px solid rgba(216, 224, 234, 0.92);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 24px 45px rgba(15, 31, 58, 0.18);
+    }
+
+    .login-card h2 {
+      margin: 0 0 4px;
+      color: var(--navy);
+      font-size: 22px;
+    }
+
+    .login-card p {
+      margin: 0 0 18px;
+      color: var(--gray-500);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 13px;
+    }
+
+    .field label {
+      color: var(--gray-700);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--gray-300);
+      border-radius: 14px;
+      outline: none;
+      background: var(--white);
+      color: var(--gray-900);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(29, 93, 159, 0.1);
+    }
+
+    .forgot-link {
+      display: inline-flex;
+      margin-top: 12px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .section-lead {
+      margin: 2px 0 16px;
+      color: var(--gray-500);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .hero-summary {
+      padding: 18px;
+      margin-bottom: 14px;
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, var(--navy), var(--navy-2));
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-summary h2 {
+      margin: 0 0 7px;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .hero-summary p {
+      margin: 0 0 14px;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .cash-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .cash-pill {
+      padding: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .cash-pill span {
+      display: block;
+      margin-bottom: 4px;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .cash-pill strong {
+      font-size: 17px;
+      line-height: 1.1;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric-card,
+    .simple-card,
+    .list-card,
+    .form-card {
+      border: 1px solid rgba(216, 224, 234, 0.9);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .metric-card {
+      min-height: 106px;
+      padding: 14px;
+    }
+
+    .metric-card.full {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      min-height: auto;
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--gray-500);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      display: block;
+      color: var(--navy);
+      font-size: 19px;
+      line-height: 1.12;
+      font-weight: 900;
+    }
+
+    .metric-value.small {
+      font-size: 17px;
+    }
+
+    .metric-note {
+      display: block;
+      margin-top: 8px;
+      color: var(--gray-500);
+      font-size: 11px;
+      line-height: 1.3;
+      font-weight: 650;
+    }
+
+    .positive {
+      color: var(--green);
+    }
+
+    .negative {
+      color: var(--red);
+    }
+
+    .warning {
+      color: var(--orange);
+    }
+
+    .simple-card {
+      padding: 15px;
+      margin-bottom: 14px;
+    }
+
+    .simple-card h3 {
+      margin: 0 0 10px;
+      color: var(--navy);
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .mini-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .mini-title h3 {
+      margin: 0;
+    }
+
+    .mini-title span {
+      color: var(--gray-500);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .bar-chart {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-item {
+      display: grid;
+      grid-template-columns: 92px 1fr 58px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .bar-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--gray-200);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--blue);
+    }
+
+    .bar-fill.green {
+      background: var(--green);
+    }
+
+    .bar-fill.orange {
+      background: var(--orange);
+    }
+
+    .bar-fill.red {
+      background: var(--red);
+    }
+
+    .alert-list,
+    .stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alert-item {
+      display: grid;
+      grid-template-columns: 7px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid rgba(216, 224, 234, 0.88);
+      border-radius: 14px;
+      background: var(--gray-100);
+    }
+
+    .alert-stripe {
+      width: 7px;
+      height: 100%;
+      min-height: 36px;
+      border-radius: 999px;
+      background: var(--orange);
+    }
+
+    .alert-item strong {
+      display: block;
+      color: var(--gray-900);
+      font-size: 13px;
+      line-height: 1.28;
+    }
+
+    .alert-item span {
+      display: block;
+      margin-top: 3px;
+      color: var(--gray-500);
+      font-size: 11px;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .quick-grid {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .action-btn,
+    .ghost-btn,
+    .card-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 15px;
+      border-radius: 15px;
+      font-size: 14px;
+      font-weight: 900;
+      transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+    }
+
+    .action-btn {
+      width: 100%;
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 10px 18px rgba(29, 93, 159, 0.22);
+    }
+
+    .action-btn.success {
+      background: var(--green);
+      box-shadow: 0 10px 18px rgba(22, 133, 95, 0.22);
+    }
+
+    .action-btn.orange {
+      background: var(--orange);
+      box-shadow: 0 10px 18px rgba(185, 107, 16, 0.2);
+    }
+
+    .action-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.68;
+    }
+
+    .ghost-btn {
+      width: 100%;
+      border: 1px solid var(--gray-300);
+      background: var(--white);
+      color: var(--navy);
+    }
+
+    .card-button {
+      min-height: 40px;
+      padding: 0 13px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12.5px;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn-row.single {
+      grid-template-columns: 1fr;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .market-card {
+      display: flex;
+      min-height: 72px;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 16px;
+      background: var(--white);
+      color: var(--navy);
+      text-align: left;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .market-card.active {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .market-logo {
+      display: grid;
+      width: 34px;
+      min-width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--navy);
+      color: white;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .market-card span:last-child {
+      font-size: 13px;
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .upload-zone {
+      display: grid;
+      min-height: 122px;
+      place-items: center;
+      padding: 18px;
+      margin-bottom: 14px;
+      border: 2px dashed #9db7d5;
+      border-radius: 20px;
+      background: #f1f7ff;
+      color: var(--navy-2);
+      text-align: center;
+    }
+
+    .upload-zone strong {
+      display: block;
+      max-width: 240px;
+      margin: 7px auto 0;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .upload-zone span {
+      display: block;
+      margin-top: 6px;
+      color: var(--gray-500);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .form-card {
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-card .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .filter-chip {
+      min-width: 0;
+      height: 42px;
+      padding: 0 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: 14px;
+      background: var(--white);
+      color: var(--gray-700);
+      font-size: 12px;
+      font-weight: 800;
+      outline: none;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .list-card {
+      padding: 14px;
+    }
+
+    .list-card + .list-card {
+      margin-top: 10px;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 11px;
+    }
+
+    .card-head h3 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 16px;
+      line-height: 1.15;
+    }
+
+    .card-head p {
+      margin: 3px 0 0;
+      color: var(--gray-500);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 12px;
+      margin-bottom: 12px;
+    }
+
+    .data-line {
+      min-width: 0;
+    }
+
+    .data-line span {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--gray-500);
+      font-size: 10.5px;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .data-line strong {
+      display: block;
+      color: var(--gray-900);
+      font-size: 13.5px;
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .data-line.full {
+      grid-column: 1 / -1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-size: 10.5px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .badge.ok,
+    .badge.validado,
+    .badge.saudavel,
+    .badge.contestavel,
+    .badge.positive {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .badge.divergencia,
+    .badge.revisar,
+    .badge.atencao {
+      background: var(--orange-soft);
+      color: var(--orange);
+    }
+
+    .badge.critica,
+    .badge.critico,
+    .badge.prejuizo {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .badge.analise,
+    .badge.pendente {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .summary-card {
+      display: grid;
+      gap: 9px;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--gray-700);
+      font-size: 12.5px;
+      line-height: 1.35;
+      font-weight: 750;
+    }
+
+    .summary-row strong {
+      color: var(--gray-900);
+      text-align: right;
+      font-weight: 900;
+    }
+
+    .discount-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .discount-card {
+      padding: 13px;
+      border: 1px solid var(--gray-300);
+      border-radius: 16px;
+      background: var(--white);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .discount-card span {
+      display: block;
+      min-height: 30px;
+      color: var(--gray-700);
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .discount-card strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--navy);
+      font-size: 17px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .insight-grid {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .insight-card {
+      display: grid;
+      grid-template-columns: 8px 1fr;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 16px;
+      background: var(--white);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .insight-card .stripe {
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .insight-card.good .stripe {
+      background: var(--green);
+    }
+
+    .insight-card.bad .stripe {
+      background: var(--red);
+    }
+
+    .insight-card.warn .stripe {
+      background: var(--orange);
+    }
+
+    .insight-card strong {
+      display: block;
+      color: var(--navy);
+      font-size: 13px;
+      line-height: 1.28;
+    }
+
+    .insight-card span {
+      display: block;
+      margin-top: 3px;
+      color: var(--gray-500);
+      font-size: 11.5px;
+      font-weight: 750;
+    }
+
+    .margin-chart {
+      display: grid;
+      gap: 12px;
+    }
+
+    .margin-row {
+      display: grid;
+      grid-template-columns: 98px 1fr 48px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .more-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .more-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 70px;
+      padding: 13px 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: 17px;
+      background: var(--white);
+      color: var(--navy);
+      text-align: left;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .more-card .left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .more-icon {
+      display: grid;
+      width: 38px;
+      min-width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .more-card h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.15;
+    }
+
+    .more-card p {
+      margin: 3px 0 0;
+      color: var(--gray-500);
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .chevron {
+      color: var(--gray-500);
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+
+
+    .more-hero {
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, #102a4d, #1d5d9f);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .more-hero h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .more-hero p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 12.5px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .more-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .more-mini-card {
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .more-mini-card span {
+      display: block;
+      margin-bottom: 4px;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .more-mini-card strong {
+      display: block;
+      font-size: 16px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .more-section-title {
+      margin: 4px 0 10px;
+      color: var(--navy);
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .more-card.primary {
+      border-color: rgba(29, 93, 159, 0.26);
+      background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+    }
+
+    .more-card .more-text {
+      min-width: 0;
+    }
+
+    .more-card .more-text h3 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 15px;
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .more-card .more-text p {
+      margin: 3px 0 0;
+      color: var(--gray-500);
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .success-box {
+      display: none;
+      padding: 14px;
+      margin: 14px 0;
+      border: 1px solid rgba(22, 133, 95, 0.25);
+      border-radius: 18px;
+      background: var(--green-soft);
+      color: var(--green);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .success-box.visible {
+      display: block;
+    }
+
+    .success-box strong {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 14px;
+      line-height: 1.32;
+    }
+
+    .toast {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 86px;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: var(--navy);
+      color: white;
+      box-shadow: 0 16px 32px rgba(15, 31, 58, 0.24);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .toast.visible {
+      display: flex;
+      animation: rise 0.2s ease;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-backdrop.visible {
+      display: grid;
+    }
+
+    .modal {
+      width: 100%;
+      padding: 20px;
+      border-radius: 22px;
+      background: var(--white);
+      box-shadow: 0 26px 56px rgba(15, 31, 58, 0.28);
+    }
+
+    .modal h3 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 19px;
+    }
+
+    .modal p {
+      margin: 0 0 16px;
+      color: var(--gray-700);
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .small-note {
+      margin: 10px 0 0;
+      color: var(--gray-500);
+      font-size: 11.5px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .empty-message {
+      padding: 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: 16px;
+      background: var(--white);
+      color: var(--gray-700);
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 700;
+      box-shadow: var(--shadow-soft);
+    }
+
+
+    /* V2: reforço visual para a tela Mais e fallback de navegação */
+    #mais .content {
+      background: linear-gradient(180deg, #f6f8fb 0%, #eef4fb 100%);
+    }
+
+    #mais .more-list {
+      margin-bottom: 14px;
+    }
+
+    #mais .more-card {
+      width: 100%;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 440px) {
+      body {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="Protótipo mobile LogiCash">
+    <div class="app">
+      <section class="screen login-screen no-nav active" id="login">
+        <div class="login-wrap">
+          <div class="brand-panel">
+            <div class="brand-mark">
+              <span class="logo-symbol">L</span>
+              <h1 class="brand-title">LogiCash</h1>
+            </div>
+            <p class="brand-subtitle">Gestão financeira para transportadoras last-mile</p>
+          </div>
+
+          <div class="login-card">
+            <h2>Acesse sua operação</h2>
+            <p>Substitua planilhas manuais por visibilidade de repasse, fluxo de caixa e margem por rota.</p>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" type="email" value="gabriel@arcostransporte.com" autocomplete="email" />
+            </div>
+            <div class="field">
+              <label for="password">Senha</label>
+              <input id="password" type="password" value="logicashteste" autocomplete="current-password" />
+            </div>
+            <button class="action-btn" type="button" data-go="home">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              Entrar
+            </button>
+            <a class="forgot-link" href="#" data-toast="Link de recuperação enviado para o e-mail cadastrado.">Esqueci minha senha</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="home">
+        <header class="topbar">
+          <div>
+            <h1>Início</h1>
+            <p>Dashboard financeiro</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <section class="hero-summary">
+            <h2>Resumo do ciclo atual</h2>
+            <p>Olá, Gabriel. Acompanhe o ciclo quinzenal sem cruzar planilhas manualmente.</p>
+            <div class="cash-row">
+              <div class="cash-pill">
+                <span>Valor previsto</span>
+                <strong>R$ 428.750</strong>
+              </div>
+              <div class="cash-pill">
+                <span>Fluxo de caixa</span>
+                <strong>14,8% margem</strong>
+              </div>
+            </div>
+          </section>
+
+          <div class="metric-grid">
+            <article class="metric-card">
+              <span class="metric-label">Valor recebido</span>
+              <strong class="metric-value positive">R$ 401.320,00</strong>
+              <span class="metric-note">Repasses conciliados</span>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Divergências identificadas</span>
+              <strong class="metric-value negative">R$ 27.430,00</strong>
+              <span class="metric-note">184 ocorrências</span>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Pagamentos a motoristas</span>
+              <strong class="metric-value">R$ 236.900,00</strong>
+              <span class="metric-note">126 motoristas ativos</span>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Margem estimada</span>
+              <strong class="metric-value positive">14,8%</strong>
+              <span class="metric-note">Por rota e cidade</span>
+            </article>
+          </div>
+
+          <section class="simple-card">
+            <div class="mini-title">
+              <h3>Ciclo financeiro</h3>
+              <span>01/06 a 15/06</span>
+            </div>
+            <div class="bar-chart">
+              <div class="bar-item">
+                <span>Recebimentos</span>
+                <div class="bar-track"><div class="bar-fill green" style="width: 94%"></div></div>
+                <span>94%</span>
+              </div>
+              <div class="bar-item">
+                <span>Descontos</span>
+                <div class="bar-track"><div class="bar-fill orange" style="width: 31%"></div></div>
+                <span>R$ 27,4k</span>
+              </div>
+              <div class="bar-item">
+                <span>Pagamentos</span>
+                <div class="bar-track"><div class="bar-fill" style="width: 72%"></div></div>
+                <span>R$ 236,9k</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="simple-card">
+            <h3>Alertas do ciclo</h3>
+            <div class="alert-list">
+              <div class="alert-item">
+                <span class="alert-stripe"></span>
+                <div><strong>Desconto duplicado identificado na pré-fatura Shopee</strong><span>R$ 2.100,00 potencialmente contestável</span></div>
+              </div>
+              <div class="alert-item">
+                <span class="alert-stripe"></span>
+                <div><strong>Repasse Mercado Livre abaixo do previsto</strong><span>Diferença de R$ 6.150,00 no ciclo quinzenal</span></div>
+              </div>
+              <div class="alert-item">
+                <span class="alert-stripe"></span>
+                <div><strong>12 motoristas com pagamento pendente de validação</strong><span>Revisão necessária antes da folha</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="simple-card">
+            <h3>Ações rápidas</h3>
+            <div class="quick-grid">
+              <button class="action-btn" type="button" data-go="prefatura">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Importar pré-fatura
+              </button>
+              <button class="ghost-btn" type="button" data-go="conciliacao">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h11M7 12h11M7 17h11M4 7h.01M4 12h.01M4 17h.01"/></svg>
+                Ver conciliação
+              </button>
+              <button class="ghost-btn" type="button" data-go="motoristas">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Calcular pagamentos
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="screen" id="prefatura">
+        <header class="topbar">
+          <div>
+            <h1>Importar pré-fatura</h1>
+            <p>Conferência automática</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <p class="section-lead">Envie a pré-fatura recebida do marketplace para iniciar a conferência automática dos valores previstos, descontos e divergências.</p>
+
+          <div class="market-grid" aria-label="Marketplaces">
+            <button class="market-card active" type="button" data-market="Mercado Livre"><span class="market-logo">ML</span><span>Mercado Livre</span></button>
+            <button class="market-card" type="button" data-market="Shopee"><span class="market-logo">SH</span><span>Shopee</span></button>
+            <button class="market-card" type="button" data-market="Amazon"><span class="market-logo">AZ</span><span>Amazon</span></button>
+            <button class="market-card" type="button" data-market="Shein"><span class="market-logo">SN</span><span>Shein</span></button>
+            <button class="market-card" type="button" data-market="TikTok Shop"><span class="market-logo">TT</span><span>TikTok Shop</span></button>
+          </div>
+
+          <button class="upload-zone" type="button" data-upload>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <strong>Arraste a pré-fatura aqui ou toque para selecionar arquivo</strong>
+            <span id="uploadLabel">CSV, XLSX ou PDF do marketplace</span>
+          </button>
+
+          <form class="form-card">
+            <div class="field">
+              <label for="marketplace">Marketplace</label>
+              <select id="marketplace">
+                <option>Mercado Livre</option>
+                <option>Shopee</option>
+                <option>Amazon</option>
+                <option>Shein</option>
+                <option>TikTok Shop</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cycle">Ciclo de pagamento</label>
+              <select id="cycle">
+                <option>Ciclo quinzenal - 01/06 a 15/06</option>
+                <option>Ciclo quinzenal - 16/06 a 30/06</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="dateStart">Data inicial</label>
+              <input id="dateStart" type="text" value="01/06/2026" />
+            </div>
+            <div class="field">
+              <label for="dateEnd">Data final</label>
+              <input id="dateEnd" type="text" value="15/06/2026" />
+            </div>
+            <div class="field">
+              <label for="city">Cidade/operação</label>
+              <select id="city">
+                <option>São Paulo/SP - Last-mile</option>
+                <option>Osasco/SP</option>
+                <option>Guarulhos/SP</option>
+                <option>Rio de Janeiro/RJ</option>
+              </select>
+            </div>
+          </form>
+
+          <button class="action-btn" type="button" id="processInvoice">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v6h6M20 20v-6h-6M20 9A8 8 0 0 0 6.3 4.7L4 10M4 15a8 8 0 0 0 13.7 4.3L20 14"/></svg>
+            Processar pré-fatura
+          </button>
+
+          <div class="success-box" id="invoiceSuccess">
+            <strong>Pré-fatura processada com sucesso. 184 divergências encontradas.</strong>
+            <button class="action-btn success" type="button" data-go="conciliacao">Ir para conciliação</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="conciliacao">
+        <header class="topbar">
+          <div>
+            <h1>Conciliação</h1>
+            <p>Repasses e descontos</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <p class="section-lead">Confira repasses, descontos e diferenças por marketplace.</p>
+
+          <div class="filter-grid" aria-label="Filtros de conciliação">
+            <select class="filter-chip"><option>Marketplace</option><option>Mercado Livre</option><option>Shopee</option><option>Amazon</option></select>
+            <select class="filter-chip"><option>Ciclo</option><option>01/06 a 15/06</option></select>
+            <select class="filter-chip"><option>Cidade</option><option>São Paulo/SP</option><option>Rio de Janeiro/RJ</option></select>
+            <select class="filter-chip"><option>Status</option><option>OK</option><option>Divergência</option><option>Em análise</option></select>
+          </div>
+
+          <div class="stack">
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>Mercado Livre</h3><p>Ciclo: 01/06 a 15/06</p></div>
+                <span class="badge divergencia">Divergência</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Valor previsto</span><strong>R$ 180.450,00</strong></div>
+                <div class="data-line"><span>Valor recebido</span><strong>R$ 174.300,00</strong></div>
+                <div class="data-line"><span>Diferença</span><strong class="negative">-R$ 6.150,00</strong></div>
+                <div class="data-line"><span>Repasse</span><strong>Banco confirmado</strong></div>
+              </div>
+              <button class="card-button" type="button" data-go="detalhes">Ver detalhes</button>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>Shopee</h3><p>Ciclo: 01/06 a 15/06</p></div>
+                <span class="badge critica">Divergência crítica</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Valor previsto</span><strong>R$ 122.800,00</strong></div>
+                <div class="data-line"><span>Valor recebido</span><strong>R$ 111.520,00</strong></div>
+                <div class="data-line"><span>Diferença</span><strong class="negative">-R$ 11.280,00</strong></div>
+                <div class="data-line"><span>Repasse</span><strong>Com descontos</strong></div>
+              </div>
+              <button class="card-button" type="button" data-go="detalhes">Ver detalhes</button>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>Amazon</h3><p>Ciclo: 01/06 a 15/06</p></div>
+                <span class="badge ok">OK</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Valor previsto</span><strong>R$ 75.500,00</strong></div>
+                <div class="data-line"><span>Valor recebido</span><strong>R$ 75.500,00</strong></div>
+                <div class="data-line"><span>Diferença</span><strong>R$ 0,00</strong></div>
+                <div class="data-line"><span>Repasse</span><strong>Conciliado</strong></div>
+              </div>
+              <button class="card-button" type="button" data-go="detalhes">Ver detalhes</button>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>Shein</h3><p>Ciclo: 01/06 a 15/06</p></div>
+                <span class="badge analise">Em análise</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Valor previsto</span><strong>R$ 50.000,00</strong></div>
+                <div class="data-line"><span>Valor recebido</span><strong>R$ 40.000,00</strong></div>
+                <div class="data-line"><span>Diferença</span><strong class="negative">-R$ 10.000,00</strong></div>
+                <div class="data-line"><span>Repasse</span><strong>Pendente</strong></div>
+              </div>
+              <button class="card-button" type="button" data-go="detalhes">Ver detalhes</button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="detalhes">
+        <header class="topbar">
+          <div>
+            <h1>Detalhes da divergência</h1>
+            <p>Raiz dos descontos</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <div class="summary-card">
+            <div class="summary-row"><span>Marketplace</span><strong>Shopee</strong></div>
+            <div class="summary-row"><span>Ciclo</span><strong>01/06 a 15/06</strong></div>
+            <div class="summary-row"><span>Valor previsto</span><strong>R$ 122.800,00</strong></div>
+            <div class="summary-row"><span>Valor recebido</span><strong>R$ 111.520,00</strong></div>
+            <div class="summary-row"><span>Diferença total</span><strong class="negative">R$ 11.280,00</strong></div>
+          </div>
+
+          <div class="discount-grid">
+            <div class="discount-card"><span>Atraso de SLA</span><strong>R$ 3.200,00</strong></div>
+            <div class="discount-card"><span>Avarias</span><strong>R$ 1.850,00</strong></div>
+            <div class="discount-card"><span>Devoluções</span><strong>R$ 2.430,00</strong></div>
+            <div class="discount-card"><span>Desconto duplicado</span><strong>R$ 2.100,00</strong></div>
+            <div class="discount-card"><span>Divergência sem detalhamento</span><strong>R$ 1.700,00</strong></div>
+          </div>
+
+          <section class="simple-card">
+            <h3>Ocorrências</h3>
+            <div class="stack">
+              <article class="list-card">
+                <div class="card-head">
+                  <div><h3>ENT-90321</h3><p>João Silva - São Paulo/SP</p></div>
+                  <span class="badge contestavel">Contestável</span>
+                </div>
+                <div class="data-grid">
+                  <div class="data-line"><span>Motivo</span><strong>Desconto duplicado</strong></div>
+                  <div class="data-line"><span>Valor</span><strong class="negative">R$ 86,00</strong></div>
+                  <div class="data-line full"><span>Contestável</span><strong>Sim</strong></div>
+                </div>
+              </article>
+
+              <article class="list-card">
+                <div class="card-head">
+                  <div><h3>ENT-90488</h3><p>Maria Santos - Osasco/SP</p></div>
+                  <span class="badge analise">Não contestável</span>
+                </div>
+                <div class="data-grid">
+                  <div class="data-line"><span>Motivo</span><strong>Desconto por SLA</strong></div>
+                  <div class="data-line"><span>Valor</span><strong class="negative">R$ 42,00</strong></div>
+                  <div class="data-line full"><span>Contestável</span><strong>Não</strong></div>
+                </div>
+              </article>
+
+              <article class="list-card">
+                <div class="card-head">
+                  <div><h3>ENT-90812</h3><p>Carlos Oliveira - Guarulhos/SP</p></div>
+                  <span class="badge contestavel">Contestável</span>
+                </div>
+                <div class="data-grid">
+                  <div class="data-line"><span>Motivo</span><strong>Divergência sem detalhamento</strong></div>
+                  <div class="data-line"><span>Valor</span><strong class="negative">R$ 120,00</strong></div>
+                  <div class="data-line full"><span>Contestável</span><strong>Sim</strong></div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <div class="btn-row">
+            <button class="action-btn orange" type="button" id="generateDispute">Gerar contestação</button>
+            <button class="ghost-btn" type="button" data-toast="Evidências exportadas com sucesso.">Exportar evidências</button>
+          </div>
+          <div class="btn-row single">
+            <button class="ghost-btn" type="button" data-go="conciliacao">Voltar para conciliação</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="motoristas">
+        <header class="topbar">
+          <div>
+            <h1>Motoristas</h1>
+            <p>Pagamento de motoristas</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <p class="section-lead">Valide pagamentos do ciclo atual.</p>
+
+          <div class="filter-grid">
+            <select class="filter-chip"><option>Ciclo</option><option>01/06 a 15/06</option></select>
+            <select class="filter-chip"><option>Cidade</option><option>São Paulo/SP</option><option>Osasco/SP</option></select>
+            <select class="filter-chip"><option>Status</option><option>Validado</option><option>Revisar</option><option>Pendente</option></select>
+            <select class="filter-chip"><option>Marketplace</option><option>Shopee</option><option>Mercado Livre</option></select>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card">
+              <span class="metric-label">Motoristas ativos</span>
+              <strong class="metric-value">126</strong>
+              <span class="metric-note">Ciclo atual</span>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Total a pagar</span>
+              <strong class="metric-value small">R$ 236.900,00</strong>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Pagamentos validados</span>
+              <strong class="metric-value small positive">R$ 198.400,00</strong>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Pendentes de revisão</span>
+              <strong class="metric-value small warning">R$ 38.500,00</strong>
+            </article>
+          </div>
+
+          <div class="stack">
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>João Silva</h3><p>842 entregas</p></div>
+                <span class="badge validado">Validado</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Bonificações</span><strong>R$ 420,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 80,00</strong></div>
+                <div class="data-line full"><span>Valor líquido</span><strong>R$ 4.550,00</strong></div>
+              </div>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>Maria Santos</h3><p>790 entregas</p></div>
+                <span class="badge validado">Validado</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Bonificações</span><strong>R$ 300,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 0,00</strong></div>
+                <div class="data-line full"><span>Valor líquido</span><strong>R$ 4.250,00</strong></div>
+              </div>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>Carlos Oliveira</h3><p>650 entregas</p></div>
+                <span class="badge revisar">Revisar</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Bonificações</span><strong>R$ 180,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 150,00</strong></div>
+                <div class="data-line full"><span>Valor líquido</span><strong>R$ 3.280,00</strong></div>
+              </div>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head">
+                <div><h3>Ana Lima</h3><p>710 entregas</p></div>
+                <span class="badge pendente">Pendente</span>
+              </div>
+              <div class="data-grid">
+                <div class="data-line"><span>Bonificações</span><strong>R$ 220,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 60,00</strong></div>
+                <div class="data-line full"><span>Valor líquido</span><strong>R$ 3.760,00</strong></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="btn-row">
+            <button class="action-btn success" type="button" data-toast="Pagamentos validados com sucesso.">Validar pagamentos</button>
+            <button class="ghost-btn" type="button" data-toast="Folha de pagamento exportada com sucesso.">Exportar folha</button>
+          </div>
+          <div class="btn-row single">
+            <button class="ghost-btn" type="button" data-go="detalhes">Ver divergências por motorista</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="margem">
+        <header class="topbar">
+          <div>
+            <h1>Margem</h1>
+            <p>Rentabilidade real</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <p class="section-lead">Veja quais operações dão lucro ou prejuízo.</p>
+
+          <div class="insight-grid">
+            <div class="insight-card good"><span class="stripe"></span><div><strong>Melhor cidade: São Paulo/SP</strong><span>Margem 18,5%</span></div></div>
+            <div class="insight-card warn"><span class="stripe"></span><div><strong>Pior cidade: Duque de Caxias/RJ</strong><span>Margem 4,2%</span></div></div>
+            <div class="insight-card good"><span class="stripe"></span><div><strong>Marketplace mais rentável: Amazon</strong><span>Margem 21,1%</span></div></div>
+            <div class="insight-card bad"><span class="stripe"></span><div><strong>Rota em alerta: Zona Oeste RJ</strong><span>Margem negativa</span></div></div>
+          </div>
+
+          <section class="simple-card">
+            <div class="mini-title">
+              <h3>Margem por cidade</h3>
+              <span>Último ciclo</span>
+            </div>
+            <div class="margin-chart">
+              <div class="margin-row"><span>São Paulo</span><div class="bar-track"><div class="bar-fill green" style="width: 88%"></div></div><span>17,8%</span></div>
+              <div class="margin-row"><span>Belo Horizonte</span><div class="bar-track"><div class="bar-fill orange" style="width: 47%"></div></div><span>9,3%</span></div>
+              <div class="margin-row"><span>Duque Caxias</span><div class="bar-track"><div class="bar-fill red" style="width: 21%"></div></div><span>4,2%</span></div>
+              <div class="margin-row"><span>Zona Oeste</span><div class="bar-track"><div class="bar-fill red" style="width: 10%"></div></div><span>-2,1%</span></div>
+            </div>
+          </section>
+
+          <div class="stack">
+            <article class="list-card">
+              <div class="card-head"><div><h3>São Paulo/SP</h3><p>Marketplace: Mercado Livre</p></div><span class="badge saudavel">Saudável</span></div>
+              <div class="data-grid">
+                <div class="data-line"><span>Receita</span><strong>R$ 95.000,00</strong></div>
+                <div class="data-line"><span>Motoristas</span><strong>R$ 58.000,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 4.200,00</strong></div>
+                <div class="data-line"><span>Margem</span><strong class="positive">17,8%</strong></div>
+              </div>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head"><div><h3>Belo Horizonte/MG</h3><p>Marketplace: Shopee</p></div><span class="badge atencao">Atenção</span></div>
+              <div class="data-grid">
+                <div class="data-line"><span>Receita</span><strong>R$ 62.000,00</strong></div>
+                <div class="data-line"><span>Motoristas</span><strong>R$ 41.000,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 6.500,00</strong></div>
+                <div class="data-line"><span>Margem</span><strong class="warning">9,3%</strong></div>
+              </div>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head"><div><h3>Duque de Caxias/RJ</h3><p>Marketplace: Shein</p></div><span class="badge critico">Crítico</span></div>
+              <div class="data-grid">
+                <div class="data-line"><span>Receita</span><strong>R$ 38.000,00</strong></div>
+                <div class="data-line"><span>Motoristas</span><strong>R$ 29.000,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 7.400,00</strong></div>
+                <div class="data-line"><span>Margem</span><strong class="negative">4,2%</strong></div>
+              </div>
+            </article>
+
+            <article class="list-card">
+              <div class="card-head"><div><h3>Zona Oeste RJ</h3><p>Marketplace: Shopee</p></div><span class="badge prejuizo">Prejuízo</span></div>
+              <div class="data-grid">
+                <div class="data-line"><span>Receita</span><strong>R$ 42.000,00</strong></div>
+                <div class="data-line"><span>Motoristas</span><strong>R$ 36.500,00</strong></div>
+                <div class="data-line"><span>Descontos</span><strong>R$ 8.200,00</strong></div>
+                <div class="data-line"><span>Margem</span><strong class="negative">-2,1%</strong></div>
+              </div>
+            </article>
+          </div>
+
+          <p class="empty-message">Rotas com margem abaixo de 5% devem ser revisadas antes da próxima negociação comercial. Use margem por cidade e margem por rota para priorizar decisões.</p>
+        </div>
+      </section>
+
+      <section class="screen" id="relatorios">
+        <header class="topbar">
+          <div>
+            <h1>Relatórios</h1>
+            <p>Gestão e contabilidade</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <p class="section-lead">Exporte informações para gestão, contestação e contabilidade.</p>
+
+          <div class="stack">
+            <article class="list-card">
+              <div class="card-head"><div><h3>Relatório de conciliação de repasses</h3><p>Previsto, recebido e diferença por marketplace</p></div></div>
+              <button class="card-button" type="button" data-toast="Arquivo gerado com sucesso.">Gerar</button>
+            </article>
+            <article class="list-card">
+              <div class="card-head"><div><h3>Relatório de divergências contestáveis</h3><p>Ocorrências com evidências para contestação</p></div></div>
+              <button class="card-button" type="button" data-toast="Arquivo gerado com sucesso.">Gerar</button>
+            </article>
+            <article class="list-card">
+              <div class="card-head"><div><h3>Relatório de pagamento de motoristas</h3><p>Entregas, bonificações, descontos e valor líquido</p></div></div>
+              <button class="card-button" type="button" data-toast="Arquivo gerado com sucesso.">Gerar</button>
+            </article>
+            <article class="list-card">
+              <div class="card-head"><div><h3>Relatório de margem por cidade, rota e marketplace</h3><p>Rentabilidade por operação</p></div></div>
+              <button class="card-button" type="button" data-toast="Arquivo gerado com sucesso.">Gerar</button>
+            </article>
+            <article class="list-card">
+              <div class="card-head"><div><h3>Relatório para contador</h3><p>Resumo financeiro do ciclo para fechamento contábil</p></div></div>
+              <button class="card-button" type="button" data-toast="Arquivo gerado com sucesso.">Gerar</button>
+            </article>
+          </div>
+
+          <section class="simple-card">
+            <h3>Resumo do ciclo</h3>
+            <div class="summary-card" style="margin-bottom: 0; box-shadow: none;">
+              <div class="summary-row"><span>Período</span><strong>01/06 a 15/06</strong></div>
+              <div class="summary-row"><span>Marketplaces analisados</span><strong>5</strong></div>
+              <div class="summary-row"><span>Total de entregas</span><strong>48.920</strong></div>
+              <div class="summary-row"><span>Valor conciliado</span><strong>R$ 401.320,00</strong></div>
+              <div class="summary-row"><span>Divergências encontradas</span><strong>R$ 27.430,00</strong></div>
+              <div class="summary-row"><span>Valor recuperável</span><strong class="positive">R$ 8.700,00</strong></div>
+            </div>
+          </section>
+
+          <div class="btn-row">
+            <button class="action-btn" type="button" data-toast="Arquivo gerado com sucesso.">Exportar PDF</button>
+            <button class="ghost-btn" type="button" data-toast="Arquivo gerado com sucesso.">Exportar Excel</button>
+          </div>
+          <div class="btn-row single">
+            <button class="ghost-btn" type="button" data-toast="Relatório para contador preparado para envio.">Enviar ao contador</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="mais">
+        <header class="topbar">
+          <div>
+            <h1>Mais</h1>
+            <p>Análises e suporte</p>
+          </div>
+          <div class="company-chip"><span class="company-dot"></span> Arcos Transporte Express</div>
+        </header>
+        <div class="content">
+          <section class="more-hero">
+            <h2>Central da operação</h2>
+            <p>Acesse as telas complementares para investigar divergências, acompanhar margem e gerar relatórios do ciclo.</p>
+            <div class="more-mini-grid">
+              <div class="more-mini-card"><span>Valor recuperável</span><strong>R$ 8.700</strong></div>
+              <div class="more-mini-card"><span>Ocorrências</span><strong>184</strong></div>
+            </div>
+          </section>
+
+          <h2 class="more-section-title">Análises financeiras</h2>
+          <div class="more-list">
+            <button class="more-card primary" type="button" data-go="detalhes">
+              <div class="left">
+                <div class="more-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 3.2 2.4 17.1A2 2 0 0 0 4.1 20h15.8a2 2 0 0 0 1.7-2.9L13.7 3.2a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+                <div class="more-text"><h3>Divergências</h3><p>Descontos, avaria, devolução e SLA</p></div>
+              </div>
+              <span class="chevron">›</span>
+            </button>
+
+            <button class="more-card primary" type="button" data-go="margem">
+              <div class="left">
+                <div class="more-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/></svg></div>
+                <div class="more-text"><h3>Margem</h3><p>Rentabilidade por rota, cidade e marketplace</p></div>
+              </div>
+              <span class="chevron">›</span>
+            </button>
+
+            <button class="more-card primary" type="button" data-go="relatorios">
+              <div class="left">
+                <div class="more-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg></div>
+                <div class="more-text"><h3>Relatórios</h3><p>Arquivos para gestão, contestação e contador</p></div>
+              </div>
+              <span class="chevron">›</span>
+            </button>
+          </div>
+
+          <h2 class="more-section-title">Conta e ajuda</h2>
+          <div class="more-list">
+            <button class="more-card" type="button" data-toast="Configurações simuladas: usuários, marketplaces e regras de cálculo.">
+              <div class="left">
+                <div class="more-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 0 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1A2 2 0 0 1 7.1 4l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 0 1 20 7.1l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></div>
+                <div class="more-text"><h3>Configurações</h3><p>Usuários, marketplaces e regras de cálculo</p></div>
+              </div>
+              <span class="chevron">›</span>
+            </button>
+
+            <button class="more-card" type="button" data-toast="Central de ajuda aberta em modo simulado.">
+              <div class="left">
+                <div class="more-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.1 9a3 3 0 1 1 5.8 1c-.5 1.4-2.2 1.9-2.7 3.2"/><path d="M12 17h.01"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div>
+                <div class="more-text"><h3>Ajuda</h3><p>Guias de importação, conciliação e contestação</p></div>
+              </div>
+              <span class="chevron">›</span>
+            </button>
+          </div>
+
+          <p class="small-note">Dica: em Divergências, Margem e Relatórios, o item Mais permanece destacado porque essas áreas são complementares.</p>
+        </div>
+      </section>
+
+      <nav class="bottom-nav hidden" id="bottomNav" aria-label="Navegação principal">
+        <button class="nav-item" type="button" data-nav="home" aria-label="Início" onclick="showScreen('home')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
+          <span>Início</span>
+        </button>
+        <button class="nav-item" type="button" data-nav="prefatura" aria-label="Pré-fatura" onclick="showScreen('prefatura')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+          <span>Pré-fatura</span>
+        </button>
+        <button class="nav-item" type="button" data-nav="conciliacao" aria-label="Conciliação" onclick="showScreen('conciliacao')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 7h12M4 12h16M4 17h10"/><path d="m17 8 3-3 2 2M19 5v6"/></svg>
+          <span>Conciliação</span>
+        </button>
+        <button class="nav-item" type="button" data-nav="motoristas" aria-label="Motoristas" onclick="showScreen('motoristas')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+          <span>Motoristas</span>
+        </button>
+        <button class="nav-item" type="button" data-nav="mais" aria-label="Mais" onclick="showScreen('mais')">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="5" cy="12" r="1.8" fill="currentColor"></circle>
+            <circle cx="12" cy="12" r="1.8" fill="currentColor"></circle>
+            <circle cx="19" cy="12" r="1.8" fill="currentColor"></circle>
+          </svg>
+          <span>Mais</span>
+        </button>
+      </nav>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal">
+          <h3 id="modalTitle">Contestação gerada</h3>
+          <p>Contestação gerada com base em 47 ocorrências potencialmente indevidas.</p>
+          <button class="action-btn" type="button" id="closeModal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const screens = Array.from(document.querySelectorAll(".screen"));
+    const bottomNav = document.getElementById("bottomNav");
+    const navItems = Array.from(document.querySelectorAll(".nav-item"));
+    const toast = document.getElementById("toast");
+    const moreScreens = new Set(["detalhes", "margem", "relatorios", "mais"]);
+    const screenIds = new Set(screens.map((screen) => screen.id));
+    let toastTimer;
+
+    function showScreen(id) {
+      if (!screenIds.has(id)) {
+        id = "mais";
+      }
+
+      clearTimeout(toastTimer);
+      toast.classList.remove("visible");
+
+      screens.forEach((screen) => {
+        const isActive = screen.id === id;
+        screen.classList.toggle("active", isActive);
+        screen.setAttribute("aria-hidden", String(!isActive));
+        if (isActive) {
+          const scrollArea = screen.querySelector(".content");
+          if (scrollArea) scrollArea.scrollTop = 0;
+        }
+      });
+
+      const isLogin = id === "login";
+      bottomNav.classList.toggle("hidden", isLogin);
+
+      const activeNav = moreScreens.has(id) ? "mais" : id;
+      navItems.forEach((item) => {
+        item.classList.toggle("active", item.dataset.nav === activeNav);
+      });
+    }
+
+    window.showScreen = showScreen;
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("visible");
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("visible");
+      }, 2400);
+    }
+
+    document.addEventListener("click", (event) => {
+      const goButton = event.target.closest("[data-go]");
+      if (goButton) {
+        event.preventDefault();
+        showScreen(goButton.dataset.go);
+        return;
+      }
+
+      const navButton = event.target.closest("[data-nav]");
+      if (navButton) {
+        showScreen(navButton.dataset.nav);
+        return;
+      }
+
+      const toastTrigger = event.target.closest("[data-toast]");
+      if (toastTrigger) {
+        event.preventDefault();
+        showToast(toastTrigger.dataset.toast);
+      }
+    });
+
+    document.querySelectorAll(".market-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".market-card").forEach((item) => item.classList.remove("active"));
+        card.classList.add("active");
+        document.getElementById("marketplace").value = card.dataset.market;
+      });
+    });
+
+    const uploadButton = document.querySelector("[data-upload]");
+    if (uploadButton) {
+      uploadButton.addEventListener("click", () => {
+        document.getElementById("uploadLabel").textContent = "pre-fatura_shopee_01-15_junho.xlsx selecionada";
+        showToast("Arquivo de pré-fatura selecionado.");
+      });
+    }
+
+    const processInvoiceButton = document.getElementById("processInvoice");
+    if (processInvoiceButton) {
+      processInvoiceButton.addEventListener("click", (event) => {
+      const button = event.currentTarget;
+      const original = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = "Processando pré-fatura...";
+      document.getElementById("invoiceSuccess").classList.remove("visible");
+
+      setTimeout(() => {
+        const successBox = document.getElementById("invoiceSuccess");
+        button.disabled = false;
+        button.innerHTML = original;
+        successBox.classList.add("visible");
+        successBox.scrollIntoView({ block: "center" });
+      }, 950);
+      });
+    }
+
+    const generateDisputeButton = document.getElementById("generateDispute");
+    if (generateDisputeButton) {
+      generateDisputeButton.addEventListener("click", () => {
+        document.getElementById("modalBackdrop").classList.add("visible");
+      });
+    }
+
+    const closeModalButton = document.getElementById("closeModal");
+    if (closeModalButton) {
+      closeModalButton.addEventListener("click", () => {
+        document.getElementById("modalBackdrop").classList.remove("visible");
+      });
+    }
+
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener("click", (event) => {
+      if (event.target.id === "modalBackdrop") {
+        event.currentTarget.classList.remove("visible");
+        }
+      });
+    }
+
+    showScreen("login");
+  </script>
+</body>
+</html>
