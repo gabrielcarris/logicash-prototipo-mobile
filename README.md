@@ -26,3 +26,7 @@ O LogiCash e uma plataforma SaaS B2B para transportadoras de pequeno e medio por
 ## Como abrir
 
 Baixe o repositorio e abra o arquivo `index.html` diretamente no navegador.
+
+Versao publicada no GitHub Pages:
+
+https://gabrielcarris.github.io/logicash-prototipo-mobile/
